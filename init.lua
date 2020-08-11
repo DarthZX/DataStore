@@ -3,10 +3,10 @@ local playerData = datastoreservice:GetDataStore("PlayerData");
 
 -- renaming in-built functions for efficiency
 
-local createthread = coroutine.create
-local resume = coroutine.resume
-local wrap = coroutine.wrap
-local yield = coroutine.yield
+local createthread = coroutine.create;
+local resume = coroutine.resume;
+local wrap = coroutine.wrap;
+local yield = coroutine.yield;
 
 -- collecting garbage to prevent memory leaks
 
@@ -18,7 +18,7 @@ local function collectgarbage(value)
 		
 	else
 		
-		warn(value .. " is not garbage!")
+		warn(value .. " is not garbage!");
 		
 	end
 	
@@ -37,12 +37,12 @@ local Data = {
 		_checkTimes = 15; -- fires when retrieving player's data gives an error 
 	
 		_checkDelay = 2; -- delay between each check
+		
+		_canUpdate = false;
 	
 	}
 	
 } do
-	
-	setmetatable({}, Data);
 	
 	-- inserted metamethods to update data!
 	
@@ -75,8 +75,10 @@ local Data = {
 			self.sessionData[player] = table.unpack(...);
 			
 		end
+			
+		Data:Update(player, ...)	
 		
-		print(self.sessionData[player]);
+		print(table.unpack(self.sessionData[player]));
 		
 		return self.sessionData;
 		
@@ -102,7 +104,19 @@ local Data = {
 						
 						data = ...;
 						
-						return "Default"
+						return "Default";
+						
+					end
+					
+					for i, val in ipairs(self.sessionData[player]) do
+						
+						table.remove(self.sessionData[player], i);
+						
+						if i == #self.sessionData[player] then
+							
+							data = ...
+							
+						end
 						
 					end
 					
@@ -174,7 +188,7 @@ local Data = {
 					
 				playerData:UpdateAsync(player.UserId, function(oldvalue)	
 					
-									
+					return oldvalue	;			
 						
 				end)			
 				
@@ -182,11 +196,37 @@ local Data = {
 			
 		else
 			
-			return "Unable to update null data"
+			return "Unable to update null data";
 			
 		end
 		
 	end
+	
+	-- Adds values to data's index if value is an number and amount are numbers
+	
+	function Data:Add(value, amount, player)
+		
+		assert(typeof(amount) == "number", "amount must be a number!");
+		
+		if typeof(value) == "number" and self.configuration._canUpdate == true then
+			
+			for i, val in ipairs(self.sessionData[player]) do
+				
+				if val == value then
+					
+					value = value + amount;
+					
+					return "Success";
+					
+				end
+				
+			end
+			
+		end
+		
+		return "Unable to add null data";
+		
+	end 
 	
 end
 

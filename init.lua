@@ -249,4 +249,4 @@ local Data = {
 	
 end
 
-return Data
+return setmetatable(Data, Data)

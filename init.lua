@@ -24,6 +24,13 @@ local function collectgarbage(value)
 	
 end
 
+local backup_Configuration = {
+	
+	_checkTimes = 15;
+	_checkDelay = 3
+	
+}
+
 -- stores all the functions for our module!
 
 local Data = {
@@ -102,7 +109,7 @@ local Data = {
 					
 					if typeof(data) == nil and player then
 						
-						data = ...;
+						Data:Add(player, ...);
 						
 						return "Default";
 						
@@ -114,7 +121,7 @@ local Data = {
 						
 						if i == #self.sessionData[player] then
 							
-							data = ...
+							Data:Add(player, ...)
 							
 						end
 						
@@ -152,7 +159,7 @@ local Data = {
 								
 								wrap(function()
 									
-									if #self.configuration > 0 and var ~= self.configuration._autoSave then
+									if #self.configuration > 0 and var ~= self.configuration._autoSave or self.configuration._canUpdate then
 							
 										collectgarbage(var)	;						
 								
@@ -186,11 +193,7 @@ local Data = {
 			
 			local success, result = pcall(function()
 					
-				playerData:UpdateAsync(player.UserId, function(oldvalue)	
-					
-					return oldvalue	;			
-						
-				end)			
+				playerData:SetAsync(player.UserId, self.sessionData[player])	
 				
 			end)
 			
@@ -227,6 +230,22 @@ local Data = {
 		return "Unable to add null data";
 		
 	end 
+	
+	function Data:Backup()
+		
+		for x = 1, #self.configuration do
+			
+			local y = x
+				
+			if self.configuration[x] == nil then
+				
+				self.configuration[x] = backup_Configuration[y]
+				
+			end
+			
+		end	
+		
+	end
 	
 end
 
